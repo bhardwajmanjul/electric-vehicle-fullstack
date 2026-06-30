@@ -1,0 +1,4 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+../electric-showroom-fronend/* linguist-documentation=false
+../electric-showroom-fronend/* linguist-vendored=true
