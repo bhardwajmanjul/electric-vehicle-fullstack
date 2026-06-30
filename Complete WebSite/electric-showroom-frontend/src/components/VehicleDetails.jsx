@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import API_BASE_URL from '../config'; // 👈 हमारी नई कॉन्फिग फाइल से लाइव URL आ गया
+import API_BASE_URL from '../config'; // 👈 हमारी कॉन्फिग फाइल से लाइव URL आ गया
 
 const VehicleDetails = () => {
   const { id } = useParams();
@@ -26,14 +25,17 @@ const VehicleDetails = () => {
 
     const fetchVehicleDetails = async () => {
       try {
-        // 👈 लोकलहोस्ट की जगह अब लाइव URL का इस्तेमाल होगा
+        // ⚡ लाइव या लोकल URL से गाड़ी का डेटा लाना
         const response = await fetch(`${API_BASE_URL}/api/vehicles/${id}`);
         if (!response.ok) throw new Error("डेटाबेस में यह गाड़ी नहीं मिली");
         const data = await response.json();
+        
+        console.log("गाड़ी की पूरी जन्मकुंडली:", data);
         setVehicle(data);
-        loading && setLoading(false);
       } catch (err) {
         console.error("गाड़ी का डेटा लाने में दिक्कत आई भाई:", err);
+      } finally {
+        // डेटा मिलने या न मिलने पर, लोडिंग को यहाँ बंद करेंगे ताकि स्टेट क्रैश न हो
         setLoading(false);
       }
     };
@@ -61,12 +63,16 @@ const VehicleDetails = () => {
     elementRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // 🚨 रेंडरिंग ऑर्डर: पहले लोडिंग स्क्रीन दिखेगी
   if (loading) return <div className="text-center py-20 font-bold text-slate-400 bg-[#02040a] min-h-screen flex items-center justify-center">3D स्टूडियो लोड हो रहा है भाई...</div>;
+  
+  // अगर लोडिंग खत्म हो गई और स्टेट में गाड़ी नहीं मिली, तब एरर स्क्रीन दिखेगी
   if (!vehicle) return <div className="text-center py-20 font-bold text-rose-400 bg-[#02040a] min-h-screen flex items-center justify-center">गाड़ी की जानकारी नहीं मिल पाई!</div>;
 
   return (
     <div className="min-h-screen bg-[#02040a] text-white font-sans relative overflow-x-hidden selection:bg-amber-500 selection:text-black">
       
+      {/* 🌌 3D स्टूडियो हीरो सेक्शन */}
       <section className="w-full h-screen relative flex flex-col justify-between overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#060b19]/60 to-[#02040a] z-10 pointer-events-none"></div>
         <div className="absolute top-[20%] left-[15%] w-[600px] h-[600px] bg-amber-600/10 blur-[180px] rounded-full pointer-events-none animate-pulse"></div>
@@ -81,6 +87,7 @@ const VehicleDetails = () => {
           </span>
         </header>
 
+        {/* 🔄 रोटेटिंग इमेज एरिया */}
         <div 
           className="absolute inset-0 w-full h-full flex flex-col justify-center items-center cursor-grab active:cursor-grabbing group z-20"
           onMouseEnter={() => setIsRotating(false)} 
@@ -92,13 +99,14 @@ const VehicleDetails = () => {
 
           <div className="w-full h-full max-h-[70vh] flex items-center justify-center relative z-10">
             <img 
-              src={vehicle.imageUrl} 
+              src={vehicle.imageUrl || 'https://images.unsplash.com/photo-1558981806-ec527fa84c39'} 
               alt={vehicle.name}
               style={{ transform: `rotateY(${rotationAngle}deg)` }}
               className="w-auto h-full max-h-[60vh] md:max-h-[68vh] object-contain transition-transform duration-100 drop-shadow-[0_35px_60px_rgba(245,158,11,0.25)]"
             />
           </div>
 
+          {/* 🔘 गाड़ी के नीचे का 3D बेस/प्लेटफॉर्म */}
           <div 
             className="w-[80vw] max-w-[1200px] h-[50px] border-b border-slate-700/30 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent rounded-[50%] -mt-16 shadow-[0_30px_70px_rgba(0,0,0,0.9)] flex items-center justify-center backdrop-blur-[2px] z-0"
             style={{ transform: `rotateX(72deg)` }}
@@ -116,6 +124,7 @@ const VehicleDetails = () => {
         </div>
       </section>
 
+      {/* 📌 स्टिकी नेविगेशन बार */}
       <div className="sticky top-0 bg-[#02040a]/90 backdrop-blur-xl border-y border-slate-900 py-4 z-40 shadow-2xl">
         <div className="max-w-xl mx-auto flex justify-center gap-4 px-4">
           <button onClick={() => scrollToSection(performanceRef)} className="flex-1 bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl hover:border-cyan-500/50 transition-all text-cyan-400">
@@ -130,7 +139,10 @@ const VehicleDetails = () => {
         </div>
       </div>
 
+      {/* 📊 स्पेसिफिकेशन्स डिटेल्स */}
       <main className="max-w-6xl mx-auto px-6 py-24 space-y-32 relative z-20">
+        
+        {/* ⚡ परफॉर्मेंस */}
         <section ref={performanceRef} className="scroll-mt-28">
           <h2 className="text-2xl md:text-3xl font-black uppercase text-cyan-400 tracking-wide mb-8 border-b border-slate-900 pb-4">⚡ Performance Metrics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -140,11 +152,14 @@ const VehicleDetails = () => {
             </div>
             <div className="bg-gradient-to-br from-slate-950 to-slate-900 p-6 rounded-2xl border border-slate-800/60 shadow-xl">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Top Speed</p>
-              <p className="text-xl font-black mt-2 text-white">{vehicle.topSpeed || '90 km/h'}</p>
+              <p className="text-xl font-black mt-2 text-white">{vehicle.topSpeed ? `${vehicle.topSpeed} km/h` : '90 km/h'}</p>
             </div>
             <div className="bg-gradient-to-br from-slate-950 to-slate-900 p-6 rounded-2xl border border-slate-800/60 shadow-xl">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">True Range</p>
-              <p className="text-xl font-black mt-2 text-white">{vehicle.maxRange || '150 km'}</p>
+              {/* 👈 यहाँ दोनों नाम चेक होंगे ताकि डेटाबेस का नाम मिसमैच न हो */}
+              <p className="text-xl font-black mt-2 text-white">
+                {vehicle.rangePerCharge || vehicle.maxRange ? `${vehicle.rangePerCharge || vehicle.maxRange} km` : '120 km'}
+              </p>
             </div>
             <div className="bg-gradient-to-br from-slate-950 to-slate-900 p-6 rounded-2xl border border-slate-800/60 shadow-xl">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Acceleration</p>
@@ -153,6 +168,7 @@ const VehicleDetails = () => {
           </div>
         </section>
 
+        {/* 🎨 डिजाइन */}
         <section ref={designRef} className="scroll-mt-28">
           <h2 className="text-2xl md:text-3xl font-black uppercase text-emerald-400 tracking-wide mb-8 border-b border-slate-900 pb-4">🎨 Premium Aesthetics & Design</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -175,6 +191,7 @@ const VehicleDetails = () => {
           </div>
         </section>
 
+        {/* 🛠️ टेक्नोलॉजी */}
         <section ref={techRef} className="scroll-mt-28">
           <h2 className="text-2xl md:text-3xl font-black uppercase text-amber-500 tracking-wide mb-8 border-b border-slate-900 pb-4">🛠️ Futuristic Technology</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -194,6 +211,7 @@ const VehicleDetails = () => {
         </section>
       </main>
 
+      {/* 🧾 पॉपअप इन्क्वायरी फॉर्म */}
       {showForm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50">
           <div className="bg-[#050b18] border border-slate-800 p-8 rounded-[28px] max-w-md w-full relative shadow-2xl shadow-cyan-500/5">

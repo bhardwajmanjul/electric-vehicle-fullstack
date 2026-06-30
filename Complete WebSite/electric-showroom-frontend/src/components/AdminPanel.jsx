@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // 🌐 लाइव डिप्लॉयमेंट के समय बस यहाँ अपना लाइव यूआरएल डाल देना भाई
-const API_BASE_URL = 'https://cg-java-backend.onrender.com'; 
+const API_BASE_URL = 'https://my-electric-web-back.onrender.com'; 
 
 const AdminPanel = () => {
   const [vehicleData, setVehicleData] = useState({
