@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// 🌐 लाइव बैकएंड का यूआरएल
-// 🌐 यह लाइन लोकल कंप्यूटर पर लोकलहोस्ट चलाएगी और रेंडर पर लाइव यूआरएल!
-    const API_BASE_URL = window.location.hostname === 'localhost' 
+// 🌐 Dynamic API URL configuration based on environment
+const API_BASE_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:8080' 
   : 'https://my-electric-web-back.onrender.com';
 
@@ -15,20 +14,20 @@ const VehicleGrid = () => {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        // ⚡ लाइव डेटाबेस से डेटा लाना
+        // ⚡ Fetching live data from backend database
         const response = await fetch(`${API_BASE_URL}/api/vehicles`);
         if (!response.ok) throw new Error("Backend error");
         const data = await response.json();
         
-        console.log("डेटाबेस से आया गाड़ियों का डेटा:", data);
+        console.log("Vehicle data successfully synchronized:", data);
         setVehicles(data);
         setLoading(false);
       } catch (err) {
         console.error("Connection failed, loading fallback data...", err);
-        // बैकएंड बंद होने या खाली होने पर बैकअप डमी डेटा
+        // Backup fallback data if backend is offline or empty
         setVehicles([
-          { id: 1, name: "Chandra Gaya Pro (Fallback)", price: 85000, rangePerCharge: 120, topSpeed: 85, imageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=500" },
-          { id: 2, name: "Manjul Speedster (Fallback)", price: 115000, rangePerCharge: 150, topSpeed: 95, imageUrl: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=500" }
+          { id: 1, name: "Chandra Gaya Pro", price: 85000, rangePerCharge: 120, topSpeed: 85, imageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=500" },
+          { id: 2, name: "Manjul Speedster", price: 115000, rangePerCharge: 150, topSpeed: 95, imageUrl: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=500" }
         ]);
         setLoading(false);
       }
@@ -36,12 +35,20 @@ const VehicleGrid = () => {
     fetchVehicles();
   }, []);
 
-  if (loading) return <div className="text-center py-20 font-bold text-slate-400">शोरूम की गाड़ियां सज रही हैं...</div>;
+  // 🔄 Professional loading state
+  if (loading) {
+    return (
+      <div className="text-center py-20 font-black text-slate-400 tracking-widest uppercase bg-slate-950 min-h-[50vh] flex items-center justify-center animate-pulse">
+        Initializing Showroom...
+      </div>
+    );
+  }
 
   return (
     <section id="vehicles" className="bg-white py-24 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
         
+        {/* 🏆 Section Header */}
         <div className="mb-16 text-center">
           <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase">
             The Elite <span className="text-blue-600">Collection</span>
@@ -49,6 +56,7 @@ const VehicleGrid = () => {
           <div className="h-1 w-20 bg-blue-600 mx-auto mt-4 rounded-full"></div>
         </div>
 
+        {/* 🚗 Vehicles Grid Matrix */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {vehicles.map((vehicle, index) => {
             const currentId = vehicle.id || (index + 1);
@@ -63,7 +71,7 @@ const VehicleGrid = () => {
               >
                 <div className="bg-white rounded-[2rem] overflow-hidden border border-slate-100 flex flex-col h-full">
                   
-                  {/* 🎨 इमेज एरिया */}
+                  {/* 🎨 Image Display Canvas */}
                   <div 
                     className="relative h-64 flex justify-center items-center pt-8 overflow-hidden"
                     style={{
@@ -78,7 +86,7 @@ const VehicleGrid = () => {
                     />
                   </div>
 
-                  {/* 📝 डिटेल्स एरिया */}
+                  {/* 📝 Product Specification Details */}
                   <div className="p-8 text-center flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
@@ -88,7 +96,7 @@ const VehicleGrid = () => {
                         ₹{vehicle.price ? vehicle.price.toLocaleString('en-IN') : '0'}
                       </p>
 
-                      {/* 📊 स्पेफिकेशन्स (जावा एंटिटी के वेरिएबल्स के अनुसार मैप्ड) */}
+                      {/* 📊 Matrix Badges */}
                       <div className="flex justify-center gap-8 mb-8 border-t border-slate-50 pt-6">
                         <div className="text-center">
                           <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Range</span>
@@ -105,10 +113,10 @@ const VehicleGrid = () => {
                       </div>
                     </div>
 
-                    {/* 🚀 प्रीमियम Explore बटन */}
+                    {/* 🚀 Premium Explore Navigation Trigger */}
                     <button 
                       onClick={() => {
-                        console.log("इस गाड़ी पर क्लिक हुआ, ID है:", currentId);
+                        console.log("Navigating to showcase setup for vehicle ID:", currentId);
                         navigate(`/vehicle/${currentId}`);
                       }} 
                       className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300"
