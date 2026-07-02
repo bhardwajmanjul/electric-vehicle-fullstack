@@ -68,7 +68,7 @@ const VehicleDetails = () => {
   if (loading) {
     return (
       <div className="text-center py-20 font-bold text-slate-400 bg-[#02040a] min-h-screen flex items-center justify-center">
-        3D स्टूडियो लोड हो रहा है भाई...
+        Loading Studio
       </div>
     );
   }
@@ -77,7 +77,7 @@ const VehicleDetails = () => {
   if (!vehicle) {
     return (
       <div className="text-center py-20 font-bold text-rose-400 bg-[#02040a] min-h-screen flex items-center justify-center">
-        गाड़ी की जानकारी नहीं मिल पाई!
+        No Vehicle Found Friend....!
       </div>
     );
   }
